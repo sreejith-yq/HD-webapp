@@ -38,11 +38,7 @@ app.route('/api/dashboard', dashboard);
 app.route('/api/appointments', appointments);
 app.route('/api/media', media);
 
-// Protected Auth Routes
-app.get('/api/auth/me', async (c) => {
-  const doctor = c.get('doctor');
-  return c.json({ doctor });
-});
+
 
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok' }));

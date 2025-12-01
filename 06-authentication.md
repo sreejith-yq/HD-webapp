@@ -148,6 +148,18 @@ Returns the authenticated doctor's profile. Requires `Authorization` header.
 }
 ```
 
+#### 3. Logout
+**POST** `/api/auth/logout`
+
+Invalidates the current session in KV. Requires `Authorization` header.
+
+```typescript
+// Response
+{
+  "success": true
+}
+```
+
 ### Token Validation (Hono Middleware)
 
 ```typescript

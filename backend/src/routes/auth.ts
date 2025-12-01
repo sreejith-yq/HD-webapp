@@ -60,6 +60,14 @@ app.get('/validate', async (c) => {
 
     try {
         const payload = await verify(token, c.env.JWT_SECRET);
+        const sessionId = payload.sessionId as string;
+
+        // Check if session exists in KV
+        const sessionData = await c.env.AUTH_SESSION.get(sessionId);
+        if (!sessionData) {
+            return c.json({ valid: false, error: 'Session expired' }, 401);
+        }
+
         const doctorId = payload.doctorId as string;
 
         const db = c.get('db');
@@ -86,6 +94,20 @@ app.get('/validate', async (c) => {
     }
 });
 
+// GET /api/auth/me - Get current doctor info
+app.get('/me', async (c) => {
+    const doctor = c.get('doctor');
+    return c.json({ doctor });
+});
+
+// POST /api/auth/logout - Invalidate session
+app.post('/logout', async (c) => {
+    const sessionId = c.get('sessionId'); // We need to ensure sessionId is set in context
+    if (sessionId) {
+        await c.env.AUTH_SESSION.delete(sessionId);
+    }
+    return c.json({ success: true });
+});
 
 
 export default app;

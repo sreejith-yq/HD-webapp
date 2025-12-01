@@ -16,8 +16,11 @@ const mockKV = {
         if (val && type === 'json') return JSON.parse(val);
         return val || null;
     },
-    put: async (key: string, value: string) => {
+    put: async (key: string, value: string, options?: { expirationTtl?: number }) => {
         kvStore.set(key, value);
+        if (options?.expirationTtl) {
+            setTimeout(() => kvStore.delete(key), options.expirationTtl * 1000);
+        }
     },
     delete: async (key: string) => {
         kvStore.delete(key);

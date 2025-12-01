@@ -33,12 +33,16 @@ async function fetchWithAuth(endpoint: string, options: RequestOptions = {}) {
 
 export const api = {
     auth: {
-        validate: async () => {
-            const response = await fetchWithAuth('/api/auth/validate');
+        validate: async (token: string) => {
+            const response = await fetchWithAuth(`/api/auth/validate?token=${token}`);
             return response.json();
         },
         me: async () => {
             const response = await fetchWithAuth('/api/auth/me');
+            return response.json();
+        },
+        logout: async () => {
+            const response = await fetchWithAuth('/api/auth/logout', { method: 'POST' });
             return response.json();
         },
     },

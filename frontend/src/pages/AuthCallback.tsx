@@ -19,11 +19,18 @@ export function AuthCallback() {
 
         const validateToken = async () => {
             try {
-                // Temporarily set token in store so api client can use it
+                // Validate token first
+                const validateResponse = await api.auth.validate(token);
+                if (!validateResponse.valid) {
+                    throw new Error(validateResponse.error || 'Token validation failed');
+                }
+
+                // Temporarily set token in store so api client can use it for subsequent requests
                 useAuthStore.setState({ token });
 
-                // Fetch current user details
-                const user = await api.auth.me();
+                // Fetch current user details (optional if validate returns user, but good for consistency)
+                // The validate endpoint now returns the doctor object too, so we can use that.
+                const user = validateResponse.doctor;
 
                 // Update store with user details
                 setAuth(token, user);

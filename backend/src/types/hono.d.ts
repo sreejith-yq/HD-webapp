@@ -8,5 +8,6 @@ declare module 'hono' {
             name: string;
             email: string | null;
         };
+        sessionId: string;
     }
 }

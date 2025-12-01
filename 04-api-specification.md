@@ -31,6 +31,7 @@ All endpoints (except `/api/auth/*`) require a valid JWT token.
 | GET | `/api/auth/validate` | Validate JWT token |
 | GET | `/api/auth/me` | Get current doctor info |
 | POST | `/api/auth/login-link` | Generate login link (TextIt/Phone) |
+| POST | `/api/auth/logout` | Invalidate session |
 
 **Implementation**: [`backend/src/routes/auth.ts`](./backend/src/routes/auth.ts) (Login Link), [`backend/src/index.ts`](./backend/src/index.ts) (Validate/Me)
 
