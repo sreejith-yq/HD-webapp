@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Doctor Dashboard uses a JWT-based authentication system integrated with WhatsApp notifications. Sessions are managed using Cloudflare KV for low-latency validation. Doctors receive a link via WhatsApp containing a one-time authentication token valid for 24 hours.
+The Doctor Dashboard uses a JWT-based authentication system integrated with WhatsApp notifications. Sessions are managed using Cloudflare KV for low-latency validation. In local development, a mock KV implementation is used with `@hono/node-server`. Doctors receive a link via WhatsApp containing a one-time authentication token valid for 24 hours.
 
 ---
 
@@ -12,13 +12,13 @@ The Doctor Dashboard uses a JWT-based authentication system integrated with What
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      AUTHENTICATION FLOW                             │
 │                                                                      │
-│  ┌──────────┐    1. Pending      ┌──────────────┐                   │
-│  │  Backend │───conversations───▶│  Notification │                   │
-│  │  System  │    detected        │   Service     │                   │
+│  ┌──────────┐                    ┌──────────────┐                   │
+│  │ External │──1. POST /login-link─▶│   Hono API   │                   │
+│  │ System   │    (Identifier)    │  (Auth Svc)  │                   │
 │  └──────────┘                    └──────┬───────┘                   │
 │                                         │                            │
-│                                         │ 2. Generate JWT            │
-│                                         │    (24hr expiry)           │
+│                                         │ 2. Generate JWT &          │
+│                                         │    Store Session (KV)      │
 │                                         ▼                            │
 │                                  ┌──────────────┐                   │
 │                                  │   WhatsApp   │                   │
@@ -38,11 +38,11 @@ The Doctor Dashboard uses a JWT-based authentication system integrated with What
 │  │  https://dashboard.example.com/?token=eyJhbGciOiJIUzI1... │       │
 │  └──────────────────────────────────────────────────────────┘       │
 │       │                                                              │
-│       │ 5. Validate token                                           │
+│       │ 5. Validate & Fetch User                                    │
 │       ▼                                                              │
-│  ┌──────────┐    6. API calls    ┌──────────────┐                   │
+│  ┌──────────┐    6. GET /me      ┌──────────────┐                   │
 │  │  React   │───with Bearer───▶  │   Hono API   │                   │
-│  │  App     │◀──────────────────│              │                   │
+│  │  App     │◀──User Profile────│              │                   │
 │  └──────────┘                    └──────────────┘                   │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
@@ -111,6 +111,41 @@ const token = await generateAuthToken({
 });
 
 const dashboardUrl = `https://dashboard.example.com/?token=${token}`;
+```
+
+### API Endpoints
+
+#### 1. Generate Login Link
+**POST** `/api/auth/login-link`
+
+Generates a magic link for the doctor identified by phone number or TextIt UUID.
+
+```typescript
+// Request
+{
+  "identifier": "9876543210" // Phone or TextIt UUID
+}
+
+// Response
+{
+  "url": "http://localhost:5173/auth/callback?token=..."
+}
+```
+
+#### 2. Get Current User
+**GET** `/api/auth/me`
+
+Returns the authenticated doctor's profile. Requires `Authorization` header.
+
+```typescript
+// Response
+{
+  "doctor": {
+    "id": "...",
+    "name": "Dr. Smith",
+    "email": "..."
+  }
+}
 ```
 
 ### Token Validation (Hono Middleware)
@@ -565,3 +600,53 @@ async function sendWhatsAppMessage(options: {
 2. **Biometric Auth**: Add fingerprint/face ID for mobile
 3. **SSO Integration**: Support clinic-wide authentication
 4. **2FA**: Optional second factor for sensitive operations
+
+---
+
+## Local Development
+
+For local development, the Cloudflare Workers environment is simulated using `@hono/node-server` and a mock KV implementation.
+
+### Setup
+
+1.  **Environment Variables**: Create `.env.development` in `backend/` with:
+    ```env
+    DATABASE_URL="postgresql://postgres:password@127.0.0.1:5433/healthydialogue?sslmode=disable"
+    JWT_SECRET="dev-secret-key"
+    ENVIRONMENT="development"
+    FRONTEND_URL="http://localhost:5173"
+    ```
+
+2.  **Run Backend**:
+    ```bash
+    cd backend
+    npm run dev
+    ```
+    This runs `src/dev.ts` which initializes the Hono app with the mock KV and loads `.env.development`.
+
+3.  **Run Frontend**:
+    ```bash
+    cd frontend
+    npm run dev
+    ```
+
+### Mock KV Implementation
+
+In `backend/src/dev.ts`, an in-memory Map is used to simulate Cloudflare KV:
+
+```typescript
+const kvStore = new Map<string, string>();
+const mockKV = {
+  get: async (key: string, type?: string) => {
+    const val = kvStore.get(key);
+    if (val && type === 'json') return JSON.parse(val);
+    return val || null;
+  },
+  put: async (key: string, value: string) => {
+    kvStore.set(key, value);
+  },
+  delete: async (key: string) => {
+    kvStore.delete(key);
+  },
+};
+```

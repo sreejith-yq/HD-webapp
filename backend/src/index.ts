@@ -18,7 +18,7 @@ const app = new Hono<{ Bindings: Env }>();
 // Global middleware
 app.use('*', logger());
 app.use('*', cors({
-  origin: ['https://dashboard.healthydialogue.com'],
+  origin: ['https://dashboard.healthydialogue.com', 'http://localhost:5173'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -37,6 +37,12 @@ app.route('/api/patients', patients);
 app.route('/api/dashboard', dashboard);
 app.route('/api/appointments', appointments);
 app.route('/api/media', media);
+
+// Protected Auth Routes
+app.get('/api/auth/me', async (c) => {
+  const doctor = c.get('doctor');
+  return c.json({ doctor });
+});
 
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok' }));

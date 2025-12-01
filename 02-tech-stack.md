@@ -87,7 +87,7 @@
 | Component | Technology | Notes |
 |-----------|------------|-------|
 | **Framework** | Hono | Lightweight, edge-optimized |
-| **Runtime** | Cloudflare Workers | Serverless edge computing |
+| **Runtime** | Cloudflare Workers (Prod) / Node.js (Dev) | Serverless edge / Local dev via @hono/node-server |
 | **ORM** | Drizzle ORM | Type-safe, edge-compatible |
 | **Validation** | Zod | Schema validation |
 | **API Style** | REST | JSON request/response |

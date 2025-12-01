@@ -41,6 +41,8 @@ app.post('/login-link', async (c) => {
         secret: c.env.JWT_SECRET,
         kv: c.env.AUTH_SESSION,
     });
+    console.log('Login Link: Generated token', token);
+    console.log('Login Link: Stored session in KV');
 
     const frontendUrl = c.env.FRONTEND_URL || 'http://localhost:5173';
     const loginLink = `${frontendUrl}/auth/callback?token=${token}`;
@@ -84,10 +86,6 @@ app.get('/validate', async (c) => {
     }
 });
 
-// GET /api/auth/me - Get current doctor info
-app.get('/me', async (c) => {
-    const doctor = c.get('doctor');
-    return c.json({ doctor });
-});
+
 
 export default app;

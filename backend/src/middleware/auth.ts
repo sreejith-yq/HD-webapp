@@ -34,15 +34,19 @@ export const authMiddleware = createMiddleware<{ Bindings: Env }>(async (c, next
 
   try {
     const payload = await verify(token, c.env.JWT_SECRET);
+    console.log('Auth Middleware: Payload verified', payload);
     const sessionId = payload.sessionId as string;
     const doctorId = payload.doctorId as string;
 
     if (!sessionId) {
+      console.log('Auth Middleware: No sessionId in payload');
       return c.json({ error: 'Invalid token structure' }, 401);
     }
 
     // Validate session from KV
+    console.log('Auth Middleware: Checking KV for sessionId', sessionId);
     const sessionData = await c.env.AUTH_SESSION.get(sessionId, 'json');
+    console.log('Auth Middleware: Session data from KV', sessionData);
 
     if (!sessionData) {
       return c.json({ error: 'Session expired or invalid' }, 401);

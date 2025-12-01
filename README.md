@@ -12,19 +12,27 @@ A mobile-friendly web dashboard for doctors to manage patient queries and check-
 
 ## Local Development
 
-1. **Start Neon Local**:
+1. **Start PostgreSQL (Docker)**:
    ```bash
-   npx neon local start
+   docker-compose up -d
+   ```
+   *Or manually:*
+   ```bash
+   docker run -d --name healthy-dialogue-db -p 5433:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_DB=healthydialogue postgres:16-alpine
    ```
 
 2. **Run Migrations**:
    ```bash
-   cd backend && npm run db:migrate
+   cd backend && npm run db:push
    ```
 
 3. **Start Development Server**:
    ```bash
-   npm run dev
+   # Backend (http://localhost:8787)
+   cd backend && npm run dev
+
+   # Frontend (http://localhost:5173)
+   cd frontend && npm run dev
    ```
 
 ## Backend Source Code

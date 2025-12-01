@@ -32,7 +32,7 @@ All endpoints (except `/api/auth/*`) require a valid JWT token.
 | GET | `/api/auth/me` | Get current doctor info |
 | POST | `/api/auth/login-link` | Generate login link (TextIt/Phone) |
 
-**Implementation**: [`backend/src/routes/auth.ts`](./backend/src/routes/auth.ts)
+**Implementation**: [`backend/src/routes/auth.ts`](./backend/src/routes/auth.ts) (Login Link), [`backend/src/index.ts`](./backend/src/index.ts) (Validate/Me)
 
 ### Conversations
 | Method | Endpoint | Description |

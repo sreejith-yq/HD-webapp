@@ -28,7 +28,7 @@ name = "healthy-dialogue-api-dev"
 [env.dev.vars]
 API_URL = "http://localhost:8787"
 ENVIRONMENT = "development"
-DATABASE_URL = "postgres://authenticated@localhost:5432/main"
+DATABASE_URL = "postgresql://postgres:password@127.0.0.1:5433/healthydialogue"
 
 # Staging environment
 [env.staging]
