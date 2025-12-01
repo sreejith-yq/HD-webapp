@@ -1,14 +1,13 @@
 // src/types/env.ts
 
 export interface Env {
-  // Database
-  NEON_DATABASE_URL: string;
-
-  // Authentication
+  // Secrets
+  DATABASE_URL: string;
   JWT_SECRET: string;
 
   // Storage
   MEDIA_BUCKET: R2Bucket;
+  AUTH_SESSION: KVNamespace;
 
   // URLs
   API_URL: string;

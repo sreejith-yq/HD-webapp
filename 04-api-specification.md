@@ -30,6 +30,7 @@ All endpoints (except `/api/auth/*`) require a valid JWT token.
 |--------|----------|-------------|
 | GET | `/api/auth/validate` | Validate JWT token |
 | GET | `/api/auth/me` | Get current doctor info |
+| POST | `/api/auth/login-link` | Generate login link (TextIt/Phone) |
 
 **Implementation**: [`backend/src/routes/auth.ts`](./backend/src/routes/auth.ts)
 
@@ -106,6 +107,26 @@ Note: To respond to a check-in, use `POST /api/conversations/:id/messages` and o
 ---
 
 ## Request/Response Examples
+
+### Generate Login Link
+
+**Request**:
+```http
+POST /api/auth/login-link
+Content-Type: application/json
+
+{
+  "identifier": "9876543210" 
+}
+```
+*Identifier can be phone number or TextIt UUID*
+
+**Response**:
+```json
+{
+  "url": "http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1..."
+}
+```
 
 ### List Conversations
 
@@ -413,7 +434,7 @@ backend/
 
 | Variable | Description |
 |----------|-------------|
-| `NEON_DATABASE_URL` | PostgreSQL connection string |
+| `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | Token signing secret |
 | `MEDIA_BUCKET` | R2 bucket binding |
 | `API_URL` | Base API URL for media URLs |

@@ -2,10 +2,11 @@
 name = "healthy-dialogue-api"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
 
 # Environment variables (use wrangler secret for sensitive data)
 # wrangler secret put JWT_SECRET
-# wrangler secret put NEON_DATABASE_URL
+# wrangler secret put DATABASE_URL
 
 [vars]
 API_URL = "https://api.healthydialogue.com"
@@ -16,12 +17,18 @@ ENVIRONMENT = "production"
 binding = "MEDIA_BUCKET"
 bucket_name = "healthy-dialogue-media"
 
+# KV Namespace binding
+[[kv_namespaces]]
+binding = "AUTH_SESSION"
+id = "YOUR_KV_NAMESPACE_ID" # TODO: Update with actual KV ID
+
 # Development environment
 [env.dev]
 name = "healthy-dialogue-api-dev"
 [env.dev.vars]
 API_URL = "http://localhost:8787"
 ENVIRONMENT = "development"
+DATABASE_URL = "postgres://authenticated@localhost:5432/main"
 
 # Staging environment
 [env.staging]

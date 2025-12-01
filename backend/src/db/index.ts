@@ -5,7 +5,7 @@ import * as relations from './relations';
 import type { Env } from '../types/env';
 
 export function getDb(env: Env) {
-  const sql = neon(env.NEON_DATABASE_URL);
+  const sql = neon(env.DATABASE_URL);
   return drizzle(sql, { schema: { ...schema, ...relations } });
 }
 

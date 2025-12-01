@@ -34,22 +34,22 @@ export const authMiddleware = createMiddleware<{ Bindings: Env }>(async (c, next
 
   try {
     const payload = await verify(token, c.env.JWT_SECRET);
+    const sessionId = payload.sessionId as string;
     const doctorId = payload.doctorId as string;
 
-    const db = c.get('db');
-    const [doctor] = await db
-      .select({
-        id: doctors.id,
-        name: doctors.name,
-        email: doctors.email,
-      })
-      .from(doctors)
-      .where(eq(doctors.id, doctorId))
-      .limit(1);
-
-    if (!doctor) {
-      return c.json({ error: 'Doctor not found' }, 401);
+    if (!sessionId) {
+      return c.json({ error: 'Invalid token structure' }, 401);
     }
+
+    // Validate session from KV
+    const sessionData = await c.env.AUTH_SESSION.get(sessionId, 'json');
+
+    if (!sessionData) {
+      return c.json({ error: 'Session expired or invalid' }, 401);
+    }
+
+    // Type assertion for session data
+    const doctor = sessionData as { id: string; name: string; email: string | null };
 
     c.set('doctorId', doctorId);
     c.set('doctor', doctor);

@@ -9,9 +9,35 @@ A mobile-friendly web dashboard for doctors to manage patient queries and check-
 | [Product Requirements](./01-product-requirements.md) | Features, user flows, UI/UX specifications |
 | [Tech Stack](./02-tech-stack.md) | Frontend, backend, infrastructure details |
 | [Database Schema](./03-database-schema.md) | PostgreSQL with Drizzle ORM |
-| [API Specification](./04-api-specification.md) | Endpoints, request/response formats |
+
+## Local Development
+
+1. **Start Neon Local**:
+   ```bash
+   npx neon local start
+   ```
+
+2. **Run Migrations**:
+   ```bash
+   cd backend && npm run db:migrate
+   ```
+
+3. **Start Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+## Backend Source Code
 | [Authentication](./06-authentication.md) | JWT tokens, WhatsApp notification flow |
 | [UI Feature List](./07-ui-feature-list.md) | Quick reference for all UI components |
+
+## Repository Structure
+
+This project is a monorepo managed with `pnpm` workspaces:
+
+- **`frontend/`**: React + Vite application (Doctor Dashboard UI)
+- **`backend/`**: Hono API on Cloudflare Workers
+- **`drizzle/`**: Database migrations (inside backend)
 
 ## Backend Source Code
 

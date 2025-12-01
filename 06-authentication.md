@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Doctor Dashboard uses a JWT-based authentication system integrated with WhatsApp notifications. Doctors receive a link via WhatsApp containing a one-time authentication token valid for 24 hours.
+The Doctor Dashboard uses a JWT-based authentication system integrated with WhatsApp notifications. Sessions are managed using Cloudflare KV for low-latency validation. Doctors receive a link via WhatsApp containing a one-time authentication token valid for 24 hours.
 
 ---
 
@@ -57,6 +57,7 @@ The Doctor Dashboard uses a JWT-based authentication system integrated with What
 ```typescript
 interface JWTPayload {
   doctorId: string;      // UUID of the doctor
+  sessionId: string;     // UUID of the session (stored in KV)
   iat: number;           // Issued at (Unix timestamp)
   exp: number;           // Expiration (Unix timestamp, +24 hours)
   jti?: string;          // Optional: JWT ID for single-use enforcement
@@ -78,16 +79,26 @@ interface GenerateTokenOptions {
 
 export async function generateAuthToken({
   doctorId,
+  doctorData,
   secret,
+  kv,
   expiresInHours = 24,
 }: GenerateTokenOptions): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
+  const sessionId = uuidv4();
+  const expiresInSeconds = expiresInHours * 60 * 60;
+
+  // Store session in KV
+  await kv.put(sessionId, JSON.stringify(doctorData), {
+      expirationTtl: expiresInSeconds,
+  });
   
   const payload = {
     doctorId,
+    sessionId,
     iat: now,
-    exp: now + (expiresInHours * 60 * 60),
-    jti: uuidv4(), // Unique token ID
+    exp: now + expiresInSeconds,
+    jti: sessionId,
   };
 
   return await sign(payload, secret);
@@ -147,58 +158,22 @@ export const authMiddleware = createMiddleware<{ Bindings: Env }>(
       const payload = await verify(token, c.env.JWT_SECRET);
       
       const doctorId = payload.doctorId as string;
-      const jti = payload.jti as string | undefined;
+      const sessionId = payload.sessionId as string;
 
-      // Optional: Check if token has been invalidated (single-use)
-      if (jti) {
-        const db = c.get('db');
-        const [tokenRecord] = await db
-          .select()
-          .from(authTokens)
-          .where(
-            and(
-              eq(authTokens.tokenHash, hashToken(jti)),
-              eq(authTokens.isValid, true),
-              gt(authTokens.expiresAt, new Date())
-            )
-          )
-          .limit(1);
-
-        if (!tokenRecord) {
-          return c.json({ 
-            error: 'Token has been revoked or expired',
-            code: 'INVALID_TOKEN' 
-          }, 401);
-        }
-
-        // Mark token as used (optional: for strict single-use)
-        // await db.update(authTokens)
-        //   .set({ usedAt: new Date() })
-        //   .where(eq(authTokens.id, tokenRecord.id));
+      if (!sessionId) {
+        return c.json({ error: 'Invalid token structure' }, 401);
       }
 
-      // Fetch doctor details
-      const db = c.get('db');
-      const [doctor] = await db
-        .select({
-          id: doctors.id,
-          name: doctors.name,
-          email: doctors.email,
-        })
-        .from(doctors)
-        .where(eq(doctors.id, doctorId))
-        .limit(1);
+      // Validate session from KV
+      const sessionData = await c.env.AUTH_SESSION.get(sessionId, 'json');
 
-      if (!doctor) {
-        return c.json({ 
-          error: 'Doctor not found',
-          code: 'DOCTOR_NOT_FOUND' 
-        }, 404);
+      if (!sessionData) {
+        return c.json({ error: 'Session expired or invalid' }, 401);
       }
 
       // Set context variables
       c.set('doctorId', doctorId);
-      c.set('doctor', doctor);
+      c.set('doctor', sessionData);
 
       await next();
     } catch (error) {

@@ -21,6 +21,8 @@ app.post('/login-link', async (c) => {
     const [doctor] = await db
         .select({
             id: doctors.id,
+            name: doctors.name,
+            email: doctors.email,
         })
         .from(doctors)
         .where(or(
@@ -35,7 +37,9 @@ app.post('/login-link', async (c) => {
 
     const token = await generateAuthToken({
         doctorId: doctor.id,
+        doctorData: doctor,
         secret: c.env.JWT_SECRET,
+        kv: c.env.AUTH_SESSION,
     });
 
     const frontendUrl = c.env.FRONTEND_URL || 'http://localhost:5173';

@@ -8,6 +8,7 @@
 | Backend | Hono on Cloudflare Workers |
 | Database | PostgreSQL on Neon |
 | ORM | Drizzle ORM |
+| Session Store | Cloudflare KV |
 | Media Storage | Cloudflare R2 |
 | CDN/Edge | Cloudflare |
 
@@ -19,7 +20,7 @@
 |-----------|------------|-------|
 | **Framework** | React 18+ | Component-based UI |
 | **Build Tool** | Vite | Fast HMR, optimized builds |
-| **Styling** | TailwindCSS | Utility-first, mobile-friendly |
+| **Styling** | TailwindCSS v4 | Utility-first, mobile-friendly |
 | **State Management** | TanStack Query + Zustand | Server state + client state |
 | **Routing** | React Router v6 | Client-side navigation |
 | **HTTP Client** | Hono RPC / fetch | Type-safe API calls |
@@ -109,7 +110,7 @@
   │   │   ├── checkins.ts          # Check-in endpoints
   │   │   └── patients.ts          # Patient data
   │   ├── /middleware
-  │   │   ├── auth.ts              # JWT validation
+  │   │   ├── auth.ts              # KV-based Session validation
   │   │   ├── cors.ts              # CORS configuration
   │   │   ├── db.ts                # Database injection
   │   │   └── logger.ts            # Request logging
@@ -118,6 +119,7 @@
   │   │   ├── schema.ts            # Table definitions
   │   │   └── relations.ts         # Table relations
   │   ├── /services
+  │   │   ├── auth.ts              # Auth services (Token generation)
   │   │   └── r2.ts                # R2 storage operations
   │   ├── /types
   │   │   ├── index.ts             # Shared types
@@ -173,9 +175,9 @@ export interface Env {
 
 ## Database
 
-### PostgreSQL on Neon
-- Serverless PostgreSQL
-- Edge-compatible via `@neondatabase/serverless`
+### PostgreSQL
+- **Production/Staging**: Neon (Serverless PostgreSQL) via `@neondatabase/serverless`
+- **Development**: Neon Local (via Neon CLI)
 - Single source of truth for all data
 
 ### ORM: Drizzle
