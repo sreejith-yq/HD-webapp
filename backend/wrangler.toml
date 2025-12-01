@@ -1,0 +1,31 @@
+# wrangler.toml
+name = "healthy-dialogue-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# Environment variables (use wrangler secret for sensitive data)
+# wrangler secret put JWT_SECRET
+# wrangler secret put NEON_DATABASE_URL
+
+[vars]
+API_URL = "https://api.healthydialogue.com"
+ENVIRONMENT = "production"
+
+# R2 bucket binding
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "healthy-dialogue-media"
+
+# Development environment
+[env.dev]
+name = "healthy-dialogue-api-dev"
+[env.dev.vars]
+API_URL = "http://localhost:8787"
+ENVIRONMENT = "development"
+
+# Staging environment
+[env.staging]
+name = "healthy-dialogue-api-staging"
+[env.staging.vars]
+API_URL = "https://api-staging.healthydialogue.com"
+ENVIRONMENT = "staging"
