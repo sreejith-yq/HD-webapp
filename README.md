@@ -85,6 +85,8 @@ A WhatsApp-style interface for healthcare providers to:
 - Review and respond to patient check-ins (single response)
 - Initiate new conversations with patients
 - Handle multimedia messages (text, images, video, audio)
+- Record and send voice notes directly
+- Capture photos and videos within the app
 - View patient health data with privacy controls
 
 ### Key Features
@@ -127,6 +129,7 @@ Doctors can only view patient data within their direct relationship:
 ┌─────────────────────────────────────────────────────────────┐
 │                        FRONTEND                             │
 │              React + Vite + TailwindCSS                     │
+│           (browser-image-compression for media)             │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼

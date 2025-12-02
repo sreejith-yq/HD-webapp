@@ -27,8 +27,8 @@ export const useAuthStore = create<AuthState>()(
                 set({ token: null, doctor: null, isAuthenticated: false }),
         }),
         {
-            name: 'auth-storage', // unique name for sessionStorage key
-            storage: createJSONStorage(() => sessionStorage), // use sessionStorage by default
+            name: 'auth-storage', // unique name for localStorage key
+            storage: createJSONStorage(() => localStorage), // use localStorage
         }
     )
 );

@@ -114,6 +114,7 @@ This document provides a quick reference to all UI components and features in th
 | Text | Patient | White bubble, left-aligned |
 | Text | Doctor | Cyan bubble (#e6fafb), right-aligned |
 | Image | Both | Thumbnail placeholder |
+| Video | Both | Video player with controls |
 | Audio | Both | Waveform + play button |
 
 ### Message Metadata
@@ -127,9 +128,10 @@ This document provides a quick reference to all UI components and features in th
 | Component | Description |
 |-----------|-------------|
 | Text Input | Rounded, gray background |
-| Attach Button | Paperclip icon |
-| Camera Button | Camera icon |
-| Send Button | Navy circle, cyan arrow icon |
+| Attach Button | Paperclip icon (Image, Video, Audio, File) |
+| Camera Button | Camera icon (Photo/Video toggle) |
+| Mic Button | Mic icon (Hold to record, release to send) |
+| Send Button | Navy circle, cyan arrow icon (replaces Mic when typing) |
 
 ---
 
@@ -298,6 +300,16 @@ This document provides a quick reference to all UI components and features in th
 | Icon | Lock (gray) |
 | Text | Gray-500 |
 | Badge | Amber "Requires Approval" |
+
+### Camera Modal
+
+| Component | Description |
+|-----------|-------------|
+| Viewfinder | Full screen video preview |
+| Capture Button | White circle (Photo) / Red circle (Video) |
+| Mode Toggle | Pill switch (Photo / Video) |
+| Close Button | "Cancel" text |
+| Video Timer | Red counter (Video mode only) |
 
 ---
 

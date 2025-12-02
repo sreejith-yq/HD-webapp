@@ -186,7 +186,9 @@ Content-Type: application/json
 
 {
   "content": "Please continue taking the medication.",
-  "contentType": "Text"
+  "contentType": "Text",
+  "mediaUrl": "...",
+  "mediaDuration": null
 }
 ```
 
@@ -239,7 +241,9 @@ Content-Type: application/json
   "content": "Here's your prescription",
   "contentType": "Image",
   "mediaUrl": "https://api.healthydialogue.com/api/media/doctor-123/documents/...",
-  "mediaKey": "doctor-123/documents/1699012345-abc123.pdf"
+  "mediaKey": "doctor-123/documents/1699012345-abc123.pdf",
+  "mediaDuration": 120,
+  "mediaThumbnail": "https://..."
 }
 ```
 

@@ -127,7 +127,7 @@ app.post('/', async (c) => {
     lastMessageSender: initialMessage ? 'Doctor' : null,
     createdAt: now,
     updatedAt: now,
-  }).returning({ id: conversations.id });
+  }).returning();
 
   // Create initial message if provided
   if (initialMessage) {
@@ -273,7 +273,7 @@ app.post('/:id/messages', async (c) => {
     mediaDuration,
     mediaThumbnail,
     createdAt: now,
-  }).returning({ id: messages.id });
+  }).returning();
 
   // Update conversation
   const preview = contentType === 'Text'
@@ -355,6 +355,31 @@ app.put('/:id/close', async (c) => {
     .where(eq(conversations.id, conversationId));
 
   return c.json({ success: true });
+});
+
+// GET /api/conversations/upload-url - Get presigned URL for media upload
+app.get('/upload-url', async (c) => {
+  const db = c.get('db');
+  const doctorId = c.get('doctorId');
+  const filename = c.req.query('filename');
+  const contentType = c.req.query('contentType');
+
+  if (!filename || !contentType) {
+    return c.json({ error: 'filename and contentType are required' }, 400);
+  }
+
+  // Generate a unique key
+  const key = `uploads/${doctorId}/${Date.now()}-${filename}`;
+
+  // TODO: Integrate with R2 to generate real presigned URL
+  // For now, return a mock URL that points to a placeholder or direct upload simulation
+  // In a real app, use: await r2.put(key, ...).getSignedUrl()
+
+  return c.json({
+    uploadUrl: `https://api.placeholder.com/upload/${key}`, // Mock URL
+    publicUrl: `https://r2.example.com/${key}`, // Mock public URL
+    key: key,
+  });
 });
 
 export default app;
